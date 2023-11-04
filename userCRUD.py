@@ -34,18 +34,21 @@ async def get_user(user_id : int):
 async def create_user(user: User):
 	user_dict = user.dict()
 	for user_iterate in user_data['user']: 
-		if user_iterate['username'] == user.username:
-			return "Username harus unik!"
+		if user_iterate['username'] == user.username or user_iterate['id'] == user.id:
+			return "Username dan id harus unik!"
 		
 	user_data['user'].append(user_dict)
 	with open(user_filename, "w") as write_file: 
 		json.dump(user_data, write_file)
-	return "Berhasil input"
+	return "Berhasil menambahkan user"
 
 @router.put('/')
 async def update_user(user : User):
 	user_dict = user.dict()
 	user_found = False 
+	for user_iterate in user_data['user']: 
+		if user_iterate['username'] == user.username:
+			return "Username sudah ada!"
 	
 	for user_idx, user_iterate in enumerate(user_data['user']): 
 		if user_iterate['id'] == user_dict['id']: 
