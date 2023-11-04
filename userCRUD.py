@@ -6,6 +6,7 @@ from typing import List
 class User(BaseModel):
 	id: int
 	username: str
+	password : str
 	boardgame : List[int]
 	city : int
 
@@ -29,6 +30,16 @@ async def get_user(user_id : int):
 			return user_iterate
 	if not user_found: 
 		return "User tidak ditemukan!"    
+	
+@router.get('/find/')
+async def does_username_exist(username : str): 
+	user_found = False
+	for user_iterate in user_data['user']: 
+		if user_iterate['username'] == username:
+			user_found = True
+			return user_iterate
+	if not user_found: 
+		return None
 
 @router.post('/')
 async def create_user(user: User):

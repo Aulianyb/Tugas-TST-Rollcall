@@ -1,1 +1,1 @@
-{"user": [{"id": 1, "username": "some_username", "boardgame": [1, 2], "city": 1}, {"id": 2, "username": "some username", "boardgame": [1], "city": 1}, {"id": 3, "username": "waduh", "boardgame": [1], "city": 1}]}
+{"user": [{"id": 1, "username": "wawa", "password": "123", "boardgame": [], "city": 2}, {"id": 2, "username": "testing", "password": "password", "boardgame": [], "city": 2}]}
