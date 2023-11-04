@@ -47,7 +47,7 @@ async def create_user(user: User):
 	for user_iterate in user_data['user']: 
 		if user_iterate['username'] == user.username or user_iterate['id'] == user.id:
 			return "Username dan id harus unik!"
-		
+	user_dict['boardgame'].sort()
 	user_data['user'].append(user_dict)
 	with open(user_filename, "w") as write_file: 
 		json.dump(user_data, write_file)

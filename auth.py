@@ -19,7 +19,7 @@ async def getCurrentUser():
 
 @router.post("/login")
 async def login(user_auth : User_auth):
-	if auth_data['auth'] != [] : 
+	if await getCurrentUser() != [] : 
 		return "Sudah ada user yang log in, harap log out terlebih dahulu"
 	fetched_user = await does_username_exist(user_auth.username)
 	if fetched_user != None: 
@@ -32,7 +32,7 @@ async def login(user_auth : User_auth):
 
 @router.delete("/logout")
 async def logout():
-	if auth_data['auth'] == [] : 
+	if await getCurrentUser() == [] : 
 		return "Tidak ada user yang logged in, harap log in terlebih dahulu"
 	auth_data['auth'].pop()
 	with open(auth_filename, "w") as write_file: 
