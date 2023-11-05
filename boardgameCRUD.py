@@ -37,7 +37,7 @@ async def create_boardgame(boardgame: Boardgame):
 	boardgame_data['boardgame'].append(boardgame_dict)
 	with open(boardgame_filename, "w") as write_file: 
 		json.dump(boardgame_data, write_file)
-	return "Berhasil menambahkan boardgame"
+		return "Berhasil menambahkan boardgame"
 
 @router.put('/')
 async def update_boardgame(boardgame : Boardgame):
