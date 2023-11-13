@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from typing import Annotated
 from auth import getCurrentUser
-from userCRUD import get_user
+from userCRUD import get_user, User
 from typing import List
 import json
 
@@ -44,15 +45,14 @@ def how_many_similarities(arr1 : List[int], arr2 : List[int]):
              
 
 @router.get('/')
-async def matchmaking():
-    currentUser = await getCurrentUser()
+async def matchmaking(currentUser: Annotated[User, Depends(getCurrentUser)]):
     matchmaker = []
     if currentUser == []: 
         return "Tidak ada user yang logged in, harap logged in terlebih dahulu"
 
     for user_iterate in user_data['user']:
-        if user_iterate['city'] == currentUser[0]['city'] and user_iterate['id'] != currentUser[0]['id']: 
-            similar_boardgame = how_many_similarities(user_iterate['boardgame'], currentUser[0]['boardgame'])
+        if user_iterate['city'] == currentUser['city'] and user_iterate['id'] != currentUser['id']: 
+            similar_boardgame = how_many_similarities(user_iterate['boardgame'], currentUser['boardgame'])
             if similar_boardgame > 0 : 
                 matchmaker.append([user_iterate['id'], similar_boardgame])
     matchmaker = sorted(matchmaker, key=lambda x: x[1], reverse=True)

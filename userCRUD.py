@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 import json
 from typing import List
+from passlib.context import CryptContext
 
 class User(BaseModel):
 	id: int
@@ -17,7 +18,12 @@ user_filename="data/user.json"
 with open(user_filename,"r") as read_file:
 	user_data = json.load(read_file)
 	
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
 @router.get('/')
+
 async def get_all_user(): 
 	return user_data['user']
 
@@ -48,6 +54,9 @@ async def create_user(user: User):
 		if user_iterate['username'] == user.username or user_iterate['id'] == user.id:
 			return "Username dan id harus unik!"
 	user_dict['boardgame'].sort()
+
+	user_dict['password'] = get_password_hash(user_dict['password'])
+
 	user_data['user'].append(user_dict)
 	with open(user_filename, "w") as write_file: 
 		json.dump(user_data, write_file)
@@ -57,13 +66,11 @@ async def create_user(user: User):
 async def update_user(user : User):
 	user_dict = user.dict()
 	user_found = False 
-	for user_iterate in user_data['user']: 
-		if user_iterate['username'] == user.username:
-			return "Username sudah ada!"
 	
 	for user_idx, user_iterate in enumerate(user_data['user']): 
 		if user_iterate['id'] == user_dict['id']: 
 			user_found = True
+			user_dict['password'] = get_password_hash(user_dict['password'])
 			user_data['user'][user_idx] = user_dict
 			with open(user_filename, "w") as write_file:
 				json.dump(user_data, write_file)
