@@ -69,6 +69,10 @@ async def getCurrentUser(token: Annotated[str, Depends(oauth2_scheme)]):
         raise credentials_exception
     return user
 
+@router.get("/")
+async def welcomePage():
+    return "Welcome to RollCall API Services!"
+
 @router.post("/token")
 async def loginAuth(form_data : Annotated[OAuth2PasswordRequestForm, Depends()]):
     fetched_user = await authenticate_user(form_data.username, form_data.password)
