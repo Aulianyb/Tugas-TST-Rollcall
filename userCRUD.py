@@ -27,11 +27,11 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 @router.get('/')
 
-async def get_all_user(): 
+async def get_all_user(currentUser: Annotated[User, Depends(getCurrentUser)]): 
 	return user_data['user']
 
 @router.get('/{user_id}')
-async def get_user(user_id : int): 
+async def get_user(user_id : int, currentUser: Annotated[User, Depends(getCurrentUser)]): 
 	user_found = False
 	for user_iterate in user_data['user']: 
 		if user_iterate['id'] == user_id:
@@ -51,7 +51,7 @@ async def does_username_exist(username : str):
 		return None
 
 @router.post('/')
-async def create_user(user: User):
+async def create_user(user: User, currentUser: Annotated[User, Depends(getCurrentUser)]):
 	user_dict = user.dict()
 	for user_iterate in user_data['user']: 
 		if user_iterate['username'] == user.username or user_iterate['id'] == user.id:
