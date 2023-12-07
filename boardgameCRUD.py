@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from auth import getCurrentUser, User, credentials_exception
+from typing import Annotated
 from pydantic import BaseModel
 import json
 
@@ -18,7 +20,7 @@ async def get_all_boardgame():
 	return boardgame_data['boardgame']
 
 @router.get('/{boardgame_id}')
-async def get_boardgame(boardgame_id : int): 
+async def get_boardgame(boardgame_id : int, currentUser: Annotated[User, Depends(getCurrentUser)]): 
 	boardgame_found = False
 	for boardgame_iterate in boardgame_data['boardgame']: 
 		if boardgame_iterate['id'] == boardgame_id:
@@ -28,7 +30,9 @@ async def get_boardgame(boardgame_id : int):
 		return "Boardgame tidak ditemukan!"    
 
 @router.post('/')
-async def create_boardgame(boardgame: Boardgame):
+async def create_boardgame(boardgame: Boardgame, currentUser: Annotated[User, Depends(getCurrentUser)]):
+	if (currentUser["role"] != "admin") :
+		raise credentials_exception
 	boardgame_dict = boardgame.dict()
 	for boardgame_iterate in boardgame_data['boardgame']: 
 		if boardgame_iterate['name'] == boardgame.name or boardgame_iterate['id'] == boardgame.id:
@@ -40,7 +44,9 @@ async def create_boardgame(boardgame: Boardgame):
 		return "Berhasil menambahkan boardgame"
 
 @router.put('/')
-async def update_boardgame(boardgame : Boardgame):
+async def update_boardgame(boardgame : Boardgame, currentUser: Annotated[User, Depends(getCurrentUser)]):
+	if (currentUser["role"] != "admin") :
+		raise credentials_exception
 	boardgame_dict = boardgame.dict()
 	boardgame_found = False 
 	for boardgame_iterate in boardgame_data['boardgame']: 
@@ -58,7 +64,9 @@ async def update_boardgame(boardgame : Boardgame):
 		return "Boardgame tidak ditemukan!"
 
 @router.delete("/{boardgame_id}")
-async def delete_boardgame(boardgame_id : int): 
+async def delete_boardgame(boardgame_id : int, currentUser: Annotated[User, Depends(getCurrentUser)]): 
+	if (currentUser["role"] != "admin") :
+		raise credentials_exception
 	boardgame_found = False
 	for boardgame_idx, boardgame_iterate in enumerate(boardgame_data['boardgame']): 
 		if boardgame_iterate['id'] == boardgame_id:

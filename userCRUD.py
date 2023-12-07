@@ -1,8 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 import json
 from typing import List
 from passlib.context import CryptContext
+from auth import getCurrentUser
+from typing import Annotated
 
 class User(BaseModel):
 	id: int
@@ -10,6 +12,7 @@ class User(BaseModel):
 	password : str
 	boardgame : List[int]
 	city : int
+	role : str
 
 router = APIRouter()
 
@@ -24,11 +27,11 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 @router.get('/')
 
-async def get_all_user(): 
+async def get_all_user(currentUser: Annotated[User, Depends(getCurrentUser)]): 
 	return user_data['user']
 
 @router.get('/{user_id}')
-async def get_user(user_id : int): 
+async def get_user(user_id : int, currentUser: Annotated[User, Depends(getCurrentUser)]): 
 	user_found = False
 	for user_iterate in user_data['user']: 
 		if user_iterate['id'] == user_id:
@@ -37,7 +40,7 @@ async def get_user(user_id : int):
 	if not user_found: 
 		return "User tidak ditemukan!"    
 	
-@router.get('/find/')
+
 async def does_username_exist(username : str): 
 	user_found = False
 	for user_iterate in user_data['user']: 
@@ -48,7 +51,7 @@ async def does_username_exist(username : str):
 		return None
 
 @router.post('/')
-async def create_user(user: User):
+async def create_user(user: User, currentUser: Annotated[User, Depends(getCurrentUser)]):
 	user_dict = user.dict()
 	for user_iterate in user_data['user']: 
 		if user_iterate['username'] == user.username or user_iterate['id'] == user.id:
@@ -63,7 +66,7 @@ async def create_user(user: User):
 	return "Berhasil menambahkan user"
 
 @router.put('/')
-async def update_user(user : User):
+async def update_user(user : User, currentUser: Annotated[User, Depends(getCurrentUser)]):
 	user_dict = user.dict()
 	user_found = False 
 	
@@ -79,7 +82,7 @@ async def update_user(user : User):
 		return "User tidak ditemukan!"
 
 @router.delete("/{user_id}")
-async def delete_user(user_id : int): 
+async def delete_user(user_id : int, currentUser: Annotated[User, Depends(getCurrentUser)]): 
 	user_found = False
 	for user_idx, user_iterate in enumerate(user_data['user']): 
 		if user_iterate['id'] == user_id:

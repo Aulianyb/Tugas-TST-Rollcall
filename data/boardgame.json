@@ -1,1 +1,15 @@
-{"boardgame": [{"id": 1, "name": "Monopoly"}]}
+{
+    "boardgame": [
+      {"id": 1, "name": "Monopoly"},
+      {"id": 2, "name": "DnD"},
+      {"id": 3, "name": "Scrabble"},
+      {"id": 4, "name": "Ticket to Ride"},
+      {"id": 5, "name": "Risk"},
+      {"id": 6, "name": "Chess"},
+      {"id": 7, "name": "Pandemic"},
+      {"id": 8, "name": "Codenames"},
+      {"id": 9, "name": "Carcassonne"},
+      {"id": 10, "name": "Splendor"}
+    ]
+  }
+  
