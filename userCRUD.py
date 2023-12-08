@@ -1,3 +1,5 @@
+# INI GAK DIBUTUHIN, AKAN DIHAPUS NTAR
+
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 import json
@@ -25,13 +27,13 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_password_hash(password):
     return pwd_context.hash(password)
-@router.get('/')
 
-async def get_all_user(currentUser: Annotated[User, Depends(getCurrentUser)]): 
+@router.get('/')
+async def get_all_user(): 
 	return user_data['user']
 
 @router.get('/{user_id}')
-async def get_user(user_id : int, currentUser: Annotated[User, Depends(getCurrentUser)]): 
+async def get_user(user_id : int): 
 	user_found = False
 	for user_iterate in user_data['user']: 
 		if user_iterate['id'] == user_id:
@@ -51,7 +53,7 @@ async def does_username_exist(username : str):
 		return None
 
 @router.post('/')
-async def create_user(user: User, currentUser: Annotated[User, Depends(getCurrentUser)]):
+async def create_user(user: User):
 	user_dict = user.dict()
 	for user_iterate in user_data['user']: 
 		if user_iterate['username'] == user.username or user_iterate['id'] == user.id:
@@ -63,7 +65,7 @@ async def create_user(user: User, currentUser: Annotated[User, Depends(getCurren
 	user_data['user'].append(user_dict)
 	with open(user_filename, "w") as write_file: 
 		json.dump(user_data, write_file)
-	return "Berhasil menambahkan user"
+	return user
 
 @router.put('/')
 async def update_user(user : User, currentUser: Annotated[User, Depends(getCurrentUser)]):

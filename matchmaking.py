@@ -61,6 +61,6 @@ async def matchmaking(currentUser: Annotated[User, Depends(getCurrentUser)]):
     if not matchmaker: 
         return []
     for player in matchmaker:
-        fetched_player = await get_user(player[0], currentUser)
+        fetched_player = await get_user(player[0])
         matchmaker_result.append([fetched_player, "kamu punya " + str(player[1]) + " kesamaan dalam minat boardgame dengan user ini!"])
     return matchmaker_result

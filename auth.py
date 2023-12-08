@@ -46,6 +46,10 @@ user_filename="data/user.json"
 with open(user_filename,"r") as read_file:
 	user_data = json.load(read_file)
 
+def get_password_hash(password):
+    return pwd_context.hash(password)
+@router.get('/')
+
 async def does_username_exist(username : str): 
 	user_found = False
 	for user_iterate in user_data['user']: 
@@ -54,6 +58,21 @@ async def does_username_exist(username : str):
 			return user_iterate
 	if not user_found: 
 		return None
+	
+@router.post('/register')
+async def create_user(user: User):
+	user_dict = user.dict()
+	for user_iterate in user_data['user']: 
+		if user_iterate['username'] == user.username or user_iterate['id'] == user.id:
+			return "Username dan id harus unik!"
+	user_dict['boardgame'].sort()
+
+	user_dict['password'] = get_password_hash(user_dict['password'])
+
+	user_data['user'].append(user_dict)
+	with open(user_filename, "w") as write_file: 
+		json.dump(user_data, write_file)
+	return user
 
 def verify_password(plain_password, hashed_password):
 	return pwd_context.verify(plain_password, hashed_password)
@@ -115,3 +134,47 @@ async def read_users_me(
 	current_user: Annotated[User, Depends(getCurrentUser)]
 ):
 	return current_user
+
+@router.get('/user')
+async def get_all_user(): 
+	return user_data['user']
+
+@router.get('/user/{user_id}')
+async def get_user(user_id : int): 
+	user_found = False
+	for user_iterate in user_data['user']: 
+		if user_iterate['id'] == user_id:
+			user_found = True
+			return user_iterate
+	if not user_found: 
+		return "User tidak ditemukan!"  
+
+
+@router.put('/user')
+async def update_user(user : User, currentUser: Annotated[User, Depends(getCurrentUser)]):
+	user_dict = user.dict()
+	user_found = False 
+	
+	for user_idx, user_iterate in enumerate(user_data['user']): 
+		if user_iterate['id'] == user_dict['id']: 
+			user_found = True
+			user_dict['password'] = get_password_hash(user_dict['password'])
+			user_data['user'][user_idx] = user_dict
+			with open(user_filename, "w") as write_file:
+				json.dump(user_data, write_file)
+			return "Berhasil update user dengan username " + user_dict['username']
+	if not user_found: 
+		return "User tidak ditemukan!"
+
+@router.delete("/user/{user_id}")
+async def delete_user(user_id : int, currentUser: Annotated[User, Depends(getCurrentUser)]): 
+	user_found = False
+	for user_idx, user_iterate in enumerate(user_data['user']): 
+		if user_iterate['id'] == user_id:
+			user_found = True
+			user_data['user'].pop(user_idx)
+			with open(user_filename, "w") as write_file: 
+				json.dump(user_data, write_file)
+			return "Berhasil menghapus user"
+	if not user_found: 
+		return "User tidak ditemukan!"  
