@@ -7,6 +7,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import json
 from passlib.context import CryptContext
 from jose import JWTError, jwt
+import requests
 
 class User(BaseModel):
 	id: int
@@ -15,6 +16,8 @@ class User(BaseModel):
 	boardgame : List[int]
 	city : int
 	role : str
+	friend : List[int]
+	reservation : List[int]
 
 SECRET_KEY = "2f8d9e786d50a6c7e23fd8a19406df9c6933f9f6a9a07e312b3692b6e8cf61f3"
 ALGORITHM = "HS256"
@@ -178,3 +181,52 @@ async def delete_user(user_id : int, currentUser: Annotated[User, Depends(getCur
 			return "Berhasil menghapus user"
 	if not user_found: 
 		return "User tidak ditemukan!"  
+	
+@router.post("/reservation")
+async def reserve_table(table_id : int, hourstart : int, duration : int, currentUser: Annotated[User, Depends(getCurrentUser)]):
+	username = currentUser["username"]
+	
+	url = f"http://40.119.238.184/reservations?reserver_name_input={username}&id_table_input={table_id}&hourstart_input={hourstart}&duration_input={duration}"
+	response = requests.post(url)
+
+	jsonResponse = response.json() 
+
+	if ('id_reservation' in jsonResponse): 
+		newUser = currentUser
+		newUser['reservation'].append(jsonResponse["id_reservation"])
+
+		user_dict = newUser
+		user_found = False 
+		for user_idx, user_iterate in enumerate(user_data['user']): 
+			if user_iterate['id'] == user_dict['id']: 
+				user_found = True
+				user_dict['password'] = user_dict['password']
+				user_data['user'][user_idx] = user_dict
+				with open(user_filename, "w") as write_file:
+					json.dump(user_data, write_file)
+				return "Berhasil update user dengan username " + user_dict['username']
+		if not user_found: 
+			return "User tidak ditemukan!"
+
+	return response.json()
+
+@router.put("/addfriend")
+async def add_friend(user_id : int, currentUser: Annotated[User, Depends(getCurrentUser)]):
+	newUser = currentUser
+	newUser['friend'].append(user_id)
+
+	user_dict = newUser
+	user_found = False 
+	
+	for user_idx, user_iterate in enumerate(user_data['user']): 
+		if user_iterate['id'] == user_dict['id']: 
+			user_found = True
+			user_dict['password'] = user_dict['password']
+			user_data['user'][user_idx] = user_dict
+			with open(user_filename, "w") as write_file:
+				json.dump(user_data, write_file)
+			return "Berhasil update user dengan username " + user_dict['username']
+	if not user_found: 
+		return "User tidak ditemukan!"
+	
+	return currentUser

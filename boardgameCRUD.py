@@ -11,7 +11,6 @@ class Boardgame(BaseModel):
 router = APIRouter()
 
 boardgame_filename="data/boardgame.json"
-
 with open(boardgame_filename,"r") as read_file:
 	boardgame_data = json.load(read_file)
 	
