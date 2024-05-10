@@ -2,6 +2,8 @@
 Nama : Aulia Nadhirah Yasmin Badrulkamal <br>
 NIM : 18221066
 
+```Currently the API has been taken down from deployment to save up Azure credit used to deploy this API```
+
 ## 🎲 Core Service
 Core service yang diimplementasikan dalam microservice “Roll Call” adalah algoritma yang akan mencari user mana saja yang cocok dengan user yang saat ini sedang login berdasarkan minat boardgame kedua user tersebut, hasil dari algoritma ini juga diurutkan berdasarkan seberapa sama minat kedua user tersebut dengan user yang paling sama ada di urutan yang lebih tinggi. 
 
